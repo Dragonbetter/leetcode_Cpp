@@ -1,0 +1,52 @@
+{
+     /*
+    ${userHome} – 用户主文件夹的路径
+    ${workspaceFolder} – 在 VSCode 中打开的文件夹的路径
+    ${workspaceFolderBasename} – 在 VS Code 中打开的文件夹的名称，不带任何斜杠 (/)
+    ${file} – 当前打开的文件
+    ${fileWorkspaceFolder} – 当前打开的工作区文件夹
+    ${relativeFile} – 相对于 ${workspaceFolder} 的当前打开的文件路径
+    ${relativeFileDirname} – 相对于 ${workspaceFolder} 的当前打开的文件夹路径
+    ${fileBasename} – 当前打开文件名
+    ${fileExtname} – 当前打开文件的扩展名
+    ${cwd} – 运行任务时的当前工作目录
+    ${lineNumber} – 活动文件中当前选定的行号
+    ${selectedText} – 活动文件中当前选定的文本
+    ${execPath} – 正在运行的 VS Code 可执行文件的路径
+    ${defaultBuildTask} – 默认运行任务的名称
+    ${pathSeparator} – 操作系统用来分隔文件路径中的组件的字符    
+     */
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) 启动",
+            "type": "cppdbg",
+            "request": "launch",
+            // ${fileDirname} – 当前打开文件的目录名 ${fileBasenameNoExtension} – 当前打开的无文件扩展名的文件名
+            "program": "${fileDirname}/${fileBasenameNoExtension}.exe", // 需要进行添加 为打开的文件夹路径下的当前打开的活动文件的文件名。
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "D:\\mingw64\\bin\\gdb.exe", // 调整 miDebuggerPath 条目，配置 gdb 的文件路径
+            "preLaunchTask": "C/C++: g++.exe 生成活动文件", // 要在调试会话开始之前启动的任务 这样不会一直编译出之前删掉的代码
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "将反汇编风格设置为 Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
