@@ -5,8 +5,8 @@
 #include <unordered_map>
 //In C++17 and later, you can use a comma-separated list in a single using declaration to bring multiple names into scope.
 //However, in earlier versions of C++, this is not allowed and each name must be brought into scope with a separate using declaration.
-using namespace std;
-using std::vector;
+using namespace std; // using指示 将命名空间的成员提升到包含命名空间本身和using指示的最近作用域的能力
+using std::vector; // using声明 一次只引入一个命名空间的一个成员 相当于是别名 
 using std::cout;
 using std::endl;
 // binary search function
@@ -17,7 +17,7 @@ class SolutionforArray{
         // 2023.11.28 Leetcode 704
         int left = 0;
         int right = nums.size()-1;
-        while(left<=right){
+        while(left<=right){ // 解决着对应的left=right的时候 边界情况
             int mid = left +((right-left)/2);
             if (nums[mid]==target){
                 return mid;}
@@ -38,7 +38,7 @@ class SolutionforArray{
         */
        int  left=0;
        int right=nums.size()-1;
-       while(left<=right){
+       while(left<=right){ 
         int mid = left+((right-left)/2);
         if (nums[mid]==target){
             return mid;
