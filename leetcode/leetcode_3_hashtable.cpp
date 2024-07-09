@@ -60,7 +60,7 @@ public:
     vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
         // leetcode 349. Intersection of Two Arrays 12.14 350.两个数组的交集 II
         unordered_set<int> result_set; // 存放结果 set为结果去重复
-        unordered_set<int> nums_set(nums1.begin(),nums1.end());// 用一个范围给set进行初始化
+        unordered_set<int> nums_set(nums1.begin(),nums1.end());// 基于迭代器用一个范围给set进行初始化
         for (int num:nums2){
             // 范围for循环语句
             // find 如果未找到返回尾后迭代器 如果找到 返回指定元素的下标
@@ -73,7 +73,7 @@ public:
     }
     int getSum(int n) {
         int sum = 0;
-        // n%10 取尾部的值 n/10去除尾部的值 进行重复选取 求余求除
+        // n%10 取余则是取尾部的值 n/10则是去除尾部的值 进行重复选取 求余求除
         while (n) {
             sum += (n % 10) * (n % 10);
             n /= 10;

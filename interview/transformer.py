@@ -57,7 +57,7 @@ class MultiHeadAttention(nn.Module):
          # 判断h是否能被d_model整除，这是因为我们之后要给每个头分配等量的词特征
         assert d_model%h==0
         # 得到每个头获得的分割词向量维度d_k
-        self.d_k = d_model //h
+        self.d_k = d_model //h # 整除标志
         self.h = h
         # 4个linear
         self.w_key = nn.Linear(d_model,d_model)

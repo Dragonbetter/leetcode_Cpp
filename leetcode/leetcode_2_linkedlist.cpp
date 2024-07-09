@@ -30,6 +30,8 @@ public:
             head = head->next;
             delete tmp; // 指针指向相同的地方相同 删除tmp同时删除了原先的head？
             tmp = nullptr;
+            // delete tmp 会删除 tmp 指针所指向的内存空间（即节点），但是它不会改变 tmp 指针本身的值，它仍然指向原先的内存地址，只是那块内存现在已经无效了。
+            // 因此，为了防止误用 tmp 指针，最好将其赋值为空指针，即 tmp = nullptr;。
         }
         // 删除非头节点
         ListNode* cur=head;
@@ -134,7 +136,7 @@ public:
        while(cur->next!=nullptr && cur->next->next!=nullptr){
             // 注意保存和记录的节点 选择 
             // 注意保存好对应的节点，以及相应的转变顺序 
-            ListNode* tmp = cur->next;
+            ListNode* tmp = cur->next;  // 最开始的头部位置 
             ListNode* tmp_after = cur->next->next->next; // 指的是两两一组的下一组首部
             // 开始翻转 依次进行
             cur->next = cur->next->next; // 第一步直接进行 此步进行完 后两步cur的指向就完全变了 故而需要先保存下来
@@ -289,7 +291,7 @@ class MyLinkedList {
 public:
     MyLinkedList() {
         _dummyHead = new ListNode(0);
-        _size = 0;  
+        _size = 0;  // 定义链表长度，定义链表头尾节点 
     }
     
     int get(int index) {
@@ -297,7 +299,7 @@ public:
         if ((index>_size-1) || (index<0)){
             return -1;
         }
-        ListNode* cur=_dummyHead->next;
+        ListNode* cur=_dummyHead->next; // 头节点 
         while(index--){
             // 注意此处 如果--index会多减一个 使得错误 会陷入死循环？？
             cur = cur->next;
@@ -308,6 +310,7 @@ public:
     void addAtHead(int val) {
         //在链表的第一个元素之前添加一个值为 val 的节点。插入后，新节点将成为链表的第一个节点。
         ListNode * newnode = new ListNode(val);
+        // 标准插入步骤 记得要对应增加长度 
         newnode->next = _dummyHead->next;
         _dummyHead->next = newnode;
         _size++;
@@ -322,6 +325,7 @@ public:
         while(cur->next!=nullptr){
             cur = cur->next;
         }
+        // 循环遍历 找到末尾节点 标志在于其指向nullptr
         cur->next = newnode;
         _size++;
     }

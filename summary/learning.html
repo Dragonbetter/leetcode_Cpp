@@ -3786,9 +3786,13 @@ vector&lt; char &gt; 和 string：在基本操作上没有区别，但是 string
 <p>=&gt;栈和队列是STL（C++标准库）里面的两个数据结构,C++标准库是有多个版本的，要知道我们使用的STL是哪个版本，才能知道对应的栈和队列的实现原理。</p>
 <h3 id="栈栈不被归类为容器被归类为容器适配器">栈=》栈不被归类为容器，被归类为容器适配器</h3>
 <p>栈提供push 和 pop 等等接口，所有元素必须符合先进后出规则，所以栈不提供走访功能，也不提供迭代器(iterator)。 不像是set 或者map 提供迭代器iterator来遍历所有元素。</p>
-<p>===============================================
-栈是以底层容器完成其所有的工作，对外提供统一的接口，底层容器是可插拔的（也就是说我们可以控制使用哪种容器来实现栈的功能）\</p>
-<p>功能：pop()(删除栈顶元素，但不返回该元素的值),top(返回栈顶元素的值，但不删除)push(item),emplace(args)(创建一个新元素压入栈顶，该元素通过拷贝或移动item而来，也可以通过由args构造而来)</p>
+<p>===============================================<br>
+栈是以底层容器完成其所有的工作，对外提供统一的接口，底层容器是可插拔的（也就是说我们可以控制使用哪种容器来实现栈的功能）</p>
+<p>功能：<br>
+pop()(删除栈顶元素，但不返回该元素的值)<br>
+top(返回栈顶元素的值，但不删除)<br>
+push(item)<br>
+emplace(args)(创建一个新元素压入栈顶，该元素通过拷贝或移动item而来，也可以通过由args构造而来)</p>
 <p>底层实现：默认的是deque（双端队列），也可以是vector，list（双向链表）；可以在创建一个适配器时将一个命名的顺序容器作为第二个类型参数。 <br>
 ==》  <br>
 陷阱1：栈是容器适配器，底层容器使用不同的容器，导致栈内数据在内存中不一定是连续分布的。
@@ -3796,8 +3800,13 @@ vector&lt; char &gt; 和 string：在基本操作上没有区别，但是 string
 <pre><code class="language-C++">std::stack&lt;<span class="hljs-type">int</span>,std::vector&lt;<span class="hljs-type">int</span>&gt;&gt; third; <span class="hljs-comment">// 使用vector为底层容器的栈</span>
 </code></pre>
 <h3 id="队列先进先出的数据结构同样不允许有遍历行为不提供迭代器">队列=》先进先出的数据结构，同样不允许有遍历行为，不提供迭代器</h3>
-<p>==============================================
-功能：pop()(删除queue的首元素，但不返回此元素？),front(返回首元素但不删除此元素),back(返回尾元素),push(item),emplace(args)(在queue末尾创建一个元素，其值为item，或则由args构建而成)</p>
+<p>==============================================<br>
+功能：<br>
+pop()(删除queue的首元素，但不返回此元素？)<br>
+front(返回首元素但不删除此元素)<br>
+back(返回尾元素)<br>
+push(item)<br>
+emplace(args)(在queue末尾创建一个元素，其值为item，或则由args构建而成)</p>
 <p>底层实现：默认基于queue实现，也可以基于list构建，但不能基于vector。</p>
 <pre><code class="language-C++">std::queue&lt;<span class="hljs-type">int</span>, std::list&lt;<span class="hljs-type">int</span>&gt;&gt; third; <span class="hljs-comment">// 定义以list为底层容器的队列</span>
 </code></pre>
@@ -3873,7 +3882,7 @@ priority_queue&lt;pair&lt;<span class="hljs-type">int</span>, <span class="hljs-
 <p>3.确定单层递归的逻辑： 确定每一层递归需要处理的信息。在这里也就会重复调用自己来实现递归的过程。</p>
 <h3 id="易误解概念">易误解概念</h3>
 <p>二叉树节点的深度：指从根节点到该节点的最长简单路径边的条数。<br>
-二叉树节点的高度：指从该节点到叶子节点的最长简单路径边的条数。<br>
+二叉树节点的高度：指从该节点到 {叶子节点} 的最长简单路径边的条数。<br>
 leetcode中强调的深度和高度很明显是按照节点来计算的。
 <img src="file:///d:\Users\19923\Desktop\coding\basic_grammer\summary\%E6%B7%B1%E5%BA%A6%E9%AB%98%E5%BA%A6.png" alt="深度高度">
 关于根节点的深度究竟是1 还是 0，不同的地方有不一样的标准，leetcode的题目中都是以节点为一度，即根节点深度是1。但维基百科上定义用边为一度，即根节点的深度是0，我们暂时以leetcode为准。<br>
@@ -3894,6 +3903,100 @@ leetcode中强调的深度和高度很明显是按照节点来计算的。
 <h2 id="回溯算法">回溯算法</h2>
 <h3 id="题目类型">题目类型</h3>
 <p><img src="file:///d:\Users\19923\Desktop\coding\basic_grammer\summary\recall.png" alt="算法类型"></p>
+<p>组合问题：N个数里面按一定规则找出k个数的集合<br>
+切割问题：一个字符串按一定规则有几种切割方式<br>
+子集问题：一个N个数的集合里有多少符合条件的子集<br>
+排列问题：N个数按一定规则全排列，有几种排列方式<br>
+棋盘问题：N皇后，解数独等等</p>
+<pre><code class="language-C++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">backtracking</span><span class="hljs-params">(参数)</span> </span>{
+    <span class="hljs-keyword">if</span> (终止条件) {
+        存放结果;
+        <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">for</span> (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) {
+        处理节点;
+        <span class="hljs-built_in">backtracking</span>(路径，选择列表); <span class="hljs-comment">// 递归</span>
+        回溯，撤销处理结果
+    }
+}
+</code></pre>
+<h2 id="动态规划">动态规划</h2>
+<h3 id="题目类型-1">题目类型</h3>
+<p><img src="file:///d:\Users\19923\Desktop\coding\basic_grammer\summary\DP.jpg" alt="算法类型"></p>
+<p>动态规划中每一个状态一定是由上一个状态推导出来的，这一点就区分于贪心，贪心没有状态推导，而是从局部直接选最优的.</p>
+<p>对于动态规划问题，我将拆解为如下五步曲，这五步都搞清楚了，才能说把动态规划真的掌握了！</p>
+<p>1.确定dp数组（dp table）(一维还是二维)以及下标的含义 <br>
+2.确定递推公式 (前后状态之间的关系 既有直接的数学推导，也会有max，min等这种的应用 )<br>
+3.dp数组如何初始化（并不一定只初始化第一个；一些情况是递推公式决定了dp数组要如何初始化）<br>
+4.确定遍历顺序 （如何遍历 顺序 还是二维的斜角 或则需要跳着或则倒着）<br>
+5.举例推导dp数组（分析可能存在的问题）<br>
+6.找bug，就是把dp数组打印出来，看看究竟是不是按照自己思路推导的！\</p>
+<p>斐波那契数</p>
+<p>不同路径:  dp[i][j] = dp[i - 1][j] + dp[i][j - 1]</p>
+<p>不同路径还不够，要有障碍:
+if (obstacleGrid[i][j] == 1) continue;
+dp[i][j] = dp[i - 1][j] + dp[i][j - 1];</p>
+<p>整数拆分:dp[i] = max(dp[i], max((i - j) * j, dp[i - j] * j))</p>
+<p>不同的二叉搜索树:dp[i] += dp[j - 1] * dp[i - j]</p>
+<h2 id="图论">图论</h2>
+<p>图的存储方式一般是 邻接表和邻接矩阵。</p>
+<h3 id="深度优先搜索理论基础dfs">深度优先搜索理论基础dfs</h3>
+<p>搜索方向，是认准一个方向搜，直到碰壁之后再换方向. <br>
+换方向是撤销原路径，改为节点链接的下一个路径，回溯的过程</p>
+<pre><code class="language-C++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(参数)</span> </span>{
+    <span class="hljs-keyword">if</span> (终止条件) {
+        存放结果;
+        <span class="hljs-keyword">return</span>;
+    }
+
+    <span class="hljs-keyword">for</span> (选择：本节点所连接的其他节点) {
+        处理节点;
+        <span class="hljs-built_in">dfs</span>(图，选择的节点); <span class="hljs-comment">// 递归</span>
+        回溯，撤销处理结果
+    }
+}
+</code></pre>
+<p>1.确认递归函数，参数 <br>
+一般情况，深搜需要 二维数组数组结构保存所有路径，需要一维数组保存单一路径，这种保存结果的数组，我们可以定义一个全局变量，避免让我们的函数参数过多。<br>
+2.确认终止条件 <br>
+终止添加不仅是结束本层递归，同时也是我们收获结果的时候。另外，其实很多dfs写法，没有写终止条件，其实终止条件写在了， 下面dfs递归的逻辑里了，也就是不符合条件，直接不会向下递归。<br>
+3.处理目前搜索节点出发的路径 <br>
+一个for循环的操作，去遍历 目前搜索节点 所能到的所有节点。</p>
+<p>797.所有可能的路径</p>
+<h3 id="广度优先搜索理论基础bfs">广度优先搜索理论基础bfs</h3>
+<p>广搜的搜索方式就适合于解决两个点之间的最短路径问题。<br>
+因为广搜是从起点出发，以起始点为中心一圈一圈进行搜索，一旦遇到终点，记录之前走过的节点就是一条最短路。正是因为BFS一圈一圈的遍历方式，所以一旦遇到终止点，那么一定是一条最短路径。<br>
+岛屿问题，这类问题的特征就是不涉及具体的遍历方式，只要能把相邻且相同属性的节点标记上就行。\</p>
+<p>一圈一圈搜索过程的实现主要是需要一个数据结构能够较好的保存遍历过的元素，队列，栈以及数组都是可以的。<br>
+队列：先进先出，每一圈都是同一个方向去转，例如统一顺时针或则逆时针。<br>
+栈： 先进后出，那么则是第一圈顺时针，第二圈逆时针，第三拳又顺时针。<br>
+但广搜并不需要注意转圈搜索的顺序。</p>
+<pre><code class="language-C++"><span class="hljs-type">int</span> dir[<span class="hljs-number">4</span>][<span class="hljs-number">2</span>] = {<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">-1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">-1</span>}; <span class="hljs-comment">// 表示四个方向</span>
+<span class="hljs-comment">// grid 是地图，也就是一个二维数组</span>
+<span class="hljs-comment">// visited标记访问过的节点，不要重复访问</span>
+<span class="hljs-comment">// x,y 表示开始搜索节点的下标</span>
+<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">bfs</span><span class="hljs-params">(vector&lt;vector&lt;<span class="hljs-type">char</span>&gt;&gt;&amp; grid, vector&lt;vector&lt;<span class="hljs-type">bool</span>&gt;&gt;&amp; visited, <span class="hljs-type">int</span> x, <span class="hljs-type">int</span> y)</span> </span>{
+    queue&lt;pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;&gt; que; <span class="hljs-comment">// 定义队列</span>
+    que.<span class="hljs-built_in">push</span>({x, y}); <span class="hljs-comment">// 起始节点加入队列</span>
+    visited[x][y] = <span class="hljs-literal">true</span>; <span class="hljs-comment">// 只要加入队列，立刻标记为访问过的节点</span>
+    <span class="hljs-keyword">while</span>(!que.<span class="hljs-built_in">empty</span>()) { <span class="hljs-comment">// 开始遍历队列里的元素</span>
+        pair&lt;<span class="hljs-type">int</span> ,<span class="hljs-type">int</span>&gt; cur = que.<span class="hljs-built_in">front</span>(); que.<span class="hljs-built_in">pop</span>(); <span class="hljs-comment">// 从队列取元素</span>
+        <span class="hljs-type">int</span> curx = cur.first;
+        <span class="hljs-type">int</span> cury = cur.second; <span class="hljs-comment">// 当前节点坐标</span>
+        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">4</span>; i++) { <span class="hljs-comment">// 开始想当前节点的四个方向左右上下去遍历</span>
+            <span class="hljs-type">int</span> nextx = curx + dir[i][<span class="hljs-number">0</span>];
+            <span class="hljs-type">int</span> nexty = cury + dir[i][<span class="hljs-number">1</span>]; <span class="hljs-comment">// 获取周边四个方向的坐标</span>
+            <span class="hljs-keyword">if</span> (nextx &lt; <span class="hljs-number">0</span> || nextx &gt;= grid.<span class="hljs-built_in">size</span>() || nexty &lt; <span class="hljs-number">0</span> || nexty &gt;= grid[<span class="hljs-number">0</span>].<span class="hljs-built_in">size</span>()) <span class="hljs-keyword">continue</span>;  <span class="hljs-comment">// 坐标越界了，直接跳过</span>
+            <span class="hljs-keyword">if</span> (!visited[nextx][nexty]) { <span class="hljs-comment">// 如果节点没被访问过</span>
+                que.<span class="hljs-built_in">push</span>({nextx, nexty});  <span class="hljs-comment">// 队列添加该节点为下一轮要遍历的节点</span>
+                visited[nextx][nexty] = <span class="hljs-literal">true</span>; <span class="hljs-comment">// 只要加入队列立刻标记，避免重复访问</span>
+            }
+        }
+    }
+
+}
+</code></pre>
 </div>
         </div>
             

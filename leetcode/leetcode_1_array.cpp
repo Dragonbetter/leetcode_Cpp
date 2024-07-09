@@ -36,7 +36,7 @@ class SolutionforArray{
         /*
         二分查找 如果找到 则返回相应的位置 如果没找到 则依据其大小返回插入的位置 
         */
-       int  left=0;
+       int left=0;
        int right=nums.size()-1;
        while(left<=right){ 
         int mid = left+((right-left)/2);
@@ -108,7 +108,7 @@ class SolutionforArray{
         return {-1,-1};
     }
     int mySqrt(int x){
-       int  left=0;
+       int left=0;
        int right=x/2+1;
        while(left<=right){
         // 注意此处 mid如果定义成int，此处的x的范围为2^31-1，故而int*int极有可能超过int所能表示的范围，因为其是先以int范围计算再赋值
@@ -199,6 +199,7 @@ class SolutionforArray{
         int result = target+1;
         for(int rightIndex=0;rightIndex<nums.size();rightIndex++){
             sum_array+=nums[rightIndex];// sum_array放前面
+            // 扩展右边界
             // 注意这里使用while，每次更新 i（起始位置），并不断比较子序列是否符合条件
             while(sum_array>=target){
                 sublength =rightIndex-leftIndex+1;
@@ -206,6 +207,7 @@ class SolutionforArray{
                 if (result==1){
                     return 1;
                 }
+                // 先取leftIndex而后++，收缩左边界
                 sum_array -= nums[leftIndex++];
             }
         }
