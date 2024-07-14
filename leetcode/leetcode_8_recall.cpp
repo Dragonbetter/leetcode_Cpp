@@ -278,7 +278,11 @@ class recall{
             return result_93;
         }
         //78
-        
+        // leetcode 698 .Partition to K Equal Sum Subsets
+        // https://leetcode.cn/problems/partition-to-k-equal-sum-subsets/solutions/1441006/by-lfool-d9o7/
+        bool canPartitionKSubsets(vector<int>& nums, int k) {
+            
+        }
 
 
         

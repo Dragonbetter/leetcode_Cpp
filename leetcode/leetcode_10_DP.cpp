@@ -182,7 +182,7 @@ class DP_Solution{
         虽然两个for循环遍历的次序不同，但是dp[i][j]所需要的数据就是左上角，根本不影响dp[i][j]公式的推导！
     5.举例推导dp数组数值：
     */
-    void bag01(int n,int bagweight){
+    void bag01_dp2(int n,int bagweight){
         // n 表示物品个数，bagweight表示背包容量
         vector<int> weight(n,0);  // 存储每件物品所占空间
         vector<int> value(n,0);   // 存储每件物品的价值
@@ -215,6 +215,92 @@ class DP_Solution{
         cout<<dp[weight.size()-1][bagweight]<<endl;
     }
     // 2024.07.10 01背包理论基础2
+    /*
+    1.01背包的一维DP，dp[j]表示的是重量为j的背包所含的价值
+    1）难点在于遍历顺序的理解
+    2）dp[j] = max(dp[j],dp[j-weight[i]]+value[i])
+    倒序遍历的原因是，本质上还是一个对二维数组的遍历，并且右下角的值依赖上一层左上角的值，
+    因此需要保证左边的值仍然是上一层的，从右向左覆盖。
+    如果是正序遍历的话，则j前面的值刚刚被添加了i，后面又会添加i；同一个i被放进去两次；
+    但i应该由上一层i-1推导而来，故而倒序的话此时的ij还是由上一层的i-1，j推导而来的
+    */
+    void bag01_dp1(int n,int bagweight){
+        vector<int> weight(n,0);
+        vector<int> value(n,0);
+        for(int i=0;i<n;i++){
+            cin >> weight[i];
+        }
+        for(int j=0;j<n;j++){
+            cin >> value[j];
+        }
+        // dp都可以初始化为0
+        vector<int> dp(bagweight+1,0);
+        for(int i=0;i<n;i++){
+            // 内层倒叙遍历循环，同时j的下限为weight[i]表明现有的j还能放进weight[i]，则可靠
+            for(int j=bagweight;j>=weight[i];j--){
+                dp[j]=std::max(dp[j],dp[j-weight[i]]+value[i]);
+            }
+        }
+        cout<<dp[bagweight]<<endl;
+    }
+    // leetcode 416 0710 Partition Equal Subset Sum
+    bool canPartition(vector<int>& nums) {
+        // 1. 01背包问题，主要理解为dp[j]<=j；当dp[target]==target时，说明找到对应的分割集合
+        int sum = 0;
+        for(int i=0; i<nums.size(); i++){
+            sum += nums[i];
+        }
+        // 1.dp 数组 20000/2+1 = 10001
+        vector<int> dp(10001);
+        int target = 0;
+        if(sum%2){
+            return false;
+        }
+        else{
+            target = sum/2; 
+        }
+        for(int i=0;i<nums.size();i++){
+            for(int j=target;j>=nums[i];j--){
+                dp[j] = max(dp[j],dp[j-nums[i]]+nums[i]);
+            }
+        }
+        if(dp[target]==target){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    // leetcode 1049 0710 last Stone Weight II
+    int lastStoneWeightII(vector<int>& stones) {
+        // 最多只会剩下一块石头，返回此石头的最小的可能重量
+        // 剩下的石头最小，那么如果每次都是相差较近的进行碰撞，最终剩下的则会是较小的。
+        // 也就是说尽可能的分成重量相似的两堆，
+        /*
+        为什么可以转01的原因： 整个题目，每个回合数两两抽出来比较，两个数之差将被再一次扔到数组里面，继续上面的过程。
+        每个回合都会丢失掉两个数字，加入一个新的数字，这个数字就是两个数的差。相当于来说，就是少了a和b，但是多了一个a-b，a,b就此消失，
+        但是在下一回合，a-b可能又被抓出去pk，pk后a-b就此再消失了，又产生了新的一个差。那么每一步来说，其实就相当于a,b没有真正意义消失。
+        到了最后一回合，我们可以知道，其实找出两个最接近的数字堆。
+        再举个例子：[31,26,33,21,40] 1：40-21 [19,26,31,33] 2: 31-(40-21) [12,26,33] 3: 33-(31-(40-21)) [21,26] 4: 26-(33-(31-(40-21))) [5]
+        总： （26+31+21） - （40+33） 这就是找出两个总和接近的两个堆。 如何让两个堆接近呢？ 那就是沿着中间分两半，找左右各自那一半，那么思路就来到了找出一半堆这里。那么就自然而然地来到取不取的问题，就是01背包问题。
+        */
+        // 416 相当于是求背包是否正好装满，而本题是求背包最多能装多少
+        vector<int> dp(15001, 0);
+        int sum = 0;
+        for (int i = 0; i < stones.size(); i++) sum += stones[i];
+        int target = sum / 2;
+        for (int i = 0; i < stones.size(); i++) { // 遍历物品
+            for (int j = target; j >= stones[i]; j--) { // 遍历背包
+                dp[j] = max(dp[j], dp[j - stones[i]] + stones[i]);
+            }
+        }
+        // 相撞之后剩下的最小石头重量就是 (sum - dp[target]) - dp[target]。
+        return sum - dp[target] - dp[target];
+    }
+    // leetcode 494 0711 
+    int findTargetSumWays(vector<int>& nums, int target) {
+        
+    }
 
 };
 int main(){
@@ -222,7 +308,7 @@ int main(){
     int n, bagweight;
     cout << "Enter n and bagweight: ";
     while(cin>>n>>bagweight){
-        s.bag01(n,bagweight);
+        s.bag01_dp2(n,bagweight);
     }
     return 0;
 }
