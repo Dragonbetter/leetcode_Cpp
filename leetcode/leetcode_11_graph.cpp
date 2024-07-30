@@ -203,6 +203,7 @@ public:
     }
     // Dijkstra algorithm
     // 单源最短路径 给出一个有向图，找到从起点到每一个节点的最短路径
+    // 不适合具有负权值的:  因为访问过的节点 不能再访问，导致错过真正的最短路
     /*
     open-set/close-set/ 每次更新对应节点的cost
     */
@@ -267,11 +268,12 @@ public:
             cout << parent[i] << "->" << i << endl;
         }
     }
-    // Dijkstra 堆优化版本 O(mlogm) 
-    void Dijkstra_Heap_optimization(){
+    // Dijkstra 堆优化版本 O(mlogm)
+    void Dijkstra_Heap_optimization()
+    {
         /*
         稠密图，n很大，相应的边也很大；
-        稀疏图，n很大，但边的数量很小；==》 从边出发 可以进行优化设计 
+        稀疏图，n很大，但边的数量很小；==》 从边出发 可以进行优化设计
         图的存储：
             邻接矩阵：二维数组，节点的角度
             邻接表：  数组+链表的形式 边的角度；有多少边 邻接表才会申请多少个对应的链表节点。
@@ -282,51 +284,60 @@ public:
         ==》整体的逻辑是一样的，区别只在于：
         邻接表的表示方式不同，构造图的时候可能有些区别
         使用优先级队列（小顶堆）来对新链接的边排序
-        不需要两层遍历：==》 理清对应的时间复杂度的计算方法。       
+        不需要两层遍历：==》 理清对应的时间复杂度的计算方法。
         */
-        struct Compare{
-            bool operator()(pair<int,int> p1,pair<int,int> p2){
+        struct Compare
+        {
+            bool operator()(pair<int, int> p1, pair<int, int> p2)
+            {
                 return p1.second > p2.second;
             }
         };
         struct Edge
         {
             /* data */
-            int to;   // 邻接顶点
-            int val;  // 边的权重
-            Edge(int t,int w):to(t),val(w){} // 构造函数
+            int to;                               // 邻接顶点
+            int val;                              // 边的权重
+            Edge(int t, int w) : to(t), val(w) {} // 构造函数
         };
-        int n,m,p1,p2,val;
-        cin>>n>>m;
+        int n, m, p1, p2, val;
+        cin >> n >> m;
         // vector - list(标准库的链表) - Edge(类)
-        vector<list<Edge>> grid(n+1);
-        while(m--){
-            cin>>p1>>p2>>val;
-            grid[p1].push_back(Edge(p2,val)); // 类的初始化 构造函数
+        vector<list<Edge>> grid(n + 1);
+        while (m--)
+        {
+            cin >> p1 >> p2 >> val;
+            grid[p1].push_back(Edge(p2, val)); // 类的初始化 构造函数
         }
         int start = 1;
         int end = n;
-        vector<int> minDist(n,numeric_limits<int>::max());
-        vector<int> visited(n,false);
-        priority_queue<pair<int,int>,vector<pair<int,int>>,Compare> pq;
-        // 类似于回溯以及递归等 需要先加入初始值 
-        pq.push(make_pair(start,0));
+        vector<int> minDist(n, numeric_limits<int>::max());
+        vector<int> visited(n, false);
+        priority_queue<pair<int, int>, vector<pair<int, int>>, Compare> pq;
+        // 类似于回溯以及递归等 需要先加入初始值
+        pq.push(make_pair(start, 0));
         minDist[start] = 0;
-        while(!pq.empty()){
-            pair<int,int> current_element = pq.top();
+        while (!pq.empty())
+        {
+            pair<int, int> current_element = pq.top();
             pq.pop();
-            if(visited[current_element.first]) continue;
+            if (visited[current_element.first])
+                continue;
             visited[current_element.first] = true;
-            for(Edge edge:grid[current_element.first]){
+            for (Edge edge : grid[current_element.first])
+            {
                 // 邻居节点同样需要判断是否已经被完整的1访问过了
-                if(!visited[edge.to] && minDist[current_element.first]+edge.val < minDist[edge.to]){
-                    minDist[edge.to] = minDist[current_element.first]+edge.val;
-                    pq.push(make_pair(edge.to,minDist[edge.to]));
+                if (!visited[edge.to] && minDist[current_element.first] + edge.val < minDist[edge.to])
+                {
+                    minDist[edge.to] = minDist[current_element.first] + edge.val;
+                    pq.push(make_pair(edge.to, minDist[edge.to]));
                 }
             }
         }
-        if(minDist[end]==numeric_limits<int>::max()) cout<<"No "<<endl;
-        else cout<<minDist[end]<<endl;
+        if (minDist[end] == numeric_limits<int>::max())
+            cout << "No " << endl;
+        else
+            cout << minDist[end] << endl;
     }
     // 最小优先队列版本，closed-set和open-list的结构
     void Dijkstra_priority_queue()
@@ -351,7 +362,7 @@ public:
                 for 所有的节点
                 更新基于当前curr的next节点的cost的值 父节点等
         */
-        int n, m, p1, p2, val,start, goal;
+        int n, m, p1, p2, val, start, goal;
         cout << "input n nodes and m edges";
         cin >> n >> m;
         cout << "input start node and goal node";
@@ -365,10 +376,10 @@ public:
         // priority_queue set
         struct Compare
         {
-            // true 表示第一个参数应该排在第二个参数的后面 
+            // true 表示第一个参数应该排在第二个参数的后面
             bool operator()(pair<int, int> const &p1, pair<int, int> const &p2)
             {
-                 // 如果 p1 的成本大于 p2 的成本，返回 true，这样 p1 就会排在 p2 后面，故而实现的则是最小堆
+                // 如果 p1 的成本大于 p2 的成本，返回 true，这样 p1 就会排在 p2 后面，故而实现的则是最小堆
                 return p1.first > p2.first; // 最小堆，费用较小的元素优先
             }
         };
@@ -438,18 +449,152 @@ public:
         if (!final_path.empty())
         {
             cout << "Shortest path from" << start << "to" << "goal" << ";";
-            for(const int& node : path){
-                cout<<node<<" ";
+            for (const int &node : path)
+            {
+                cout << node << " ";
             }
-            cout << "with cost "<< final_cost <<endl;
+            cout << "with cost " << final_cost << endl;
         }
-        else{
-            cout<<"No path found from "<< start << "to "<<goal<<endl;
+        else
+        {
+            cout << "No path found from " << start << "to " << goal << endl;
         }
     }
     // 具有负权的图最短路径算法
-    void BellmanFord(){
+    void BellmanFord()
+    {
         // 负权回路是指一系列道路的总权值为负，这样的回路使得通过反复经过回路中的道路，理论上可以无限地减少总成本或无限地增加总收益。
-        
+        /*
+        正权重环/0环:只需考虑不超过n-1条边的，无重复顶点的简单路径
+        负权重环： 最短路径是不良定义的；
+        有向无环图：基于拓扑排序和动态规划即可解答出 d(v)={0,如果v=s；min{d(u)+w(u,v)},否则；}
+        一般有向图：需要检测负权重环，并在无负权重环时输出最短路径
+        ==》当存在负环的时候，顶点之间会互相依赖，拓扑排序不再可靠
+        此时需要定义更细一步的子问题: d(v) => d(v,k) 计算从s到v的，最多包含k条边的最短路径
+        d(v,k) = min{d(v,k-1),min{d(u,k-1)+w(u,v)}} u是v的前驱节点，至多k条边，则可能还是k-1条，k-2条；
+        k轮循环，每次循环都对所有边进行一次松弛；
+        for k=1 to |V| do: [相当于最外围的min]
+            for each edge(u,v) 属于 E do: [相当于内部的min，考虑每一条顶点是v的节点，其实相当于更新每个节点]
+                if d(v) > d(u) + w(u,v) then
+                    d(v) = d(u) + w(u,v);
+        基于迭代的方式计算d(v,k)==>BellmanFord 算法
+        基于边！！ 不是基于节点的顺序遍历
+        【【对所有边松弛一次，相当于计算 起点到达 与起点一条边相连的节点 的最短距离】】
+        对所有边松弛 n-1 次 就一定能得到 起点到达 终点的最短距离。
+        时间复杂度：O(N*E)
+        ==> 松弛其实是为了应对可能的环，因为某一个节点可能在存在环的情况下会被多次访问，
+        而这可以运用边来衡量，即经过多少条边（类似于松弛多少次）到这的最短距离
+        */
+        int n, m, p1, p2, val;
+        cin >> n >> m;
+        vector<vector<int>> grid;
+        while (m--)
+        {
+            cin >> p1 >> p2 >> val;
+            grid.push_back({p1, p2, val}); // 存储的是边，边的表达形式 Edge 不是原本的密集的二维图
+        }
+        int start = 1; // 起点
+        int end = n;   // 终点
+        vector<int> minDist(n + 1, numeric_limits<int>::max());
+        minDist[start] = 0;
+        for (int i = 1; i < n; i++)
+        { // 对所有的边进行n-1次的松弛
+            for (vector<int> &side : grid)
+            {
+                int from = side[0];
+                int to = side[1];
+                int price = side[2];
+                // 松弛操作
+                // minDist[from] != INT_MAX 防止从未计算过的节点出发
+                if (minDist[from] != numeric_limits<int>::max() && minDist[to] > minDist[from] + price)
+                {
+                    minDist[to] = minDist[from] + price;
+                }
+            }
+        }
+        if (minDist[end] == numeric_limits<int>::max())
+        {
+            cout << "unconnected" << endl;
+        }
+        else
+        {
+            cout << minDist[end] << endl;
+        }
     }
+    // 2024.07.15 Bellman_ford 队列优化算法 解决第一类冗余
+    void SPFA()
+    {
+
+        /*
+         Bellman算法存在两类冗余：
+         1.第一类是每一次都对所有的边进行松弛操作，松弛操作最终的目的还是修改节点to的值，
+          但如果节点from在上一轮迭代中，没有变化，那么这轮其实是不需要更新节点from对应的end的，
+          因为他们的值本身也不会变化。
+          ==》 只需要对 上一次松弛的时候更新过的节点作为出发节点所连接的边 进行松弛就够了。
+          ==》 基于队列优化的Bellmanford算法 ：SPFA
+         2.第二类
+          即每次都对上次更新过的所有from节点在下一次都进行更新，但其实依据最短路径原理
+          每次只需要选上一轮迭代结束后 from最小的出来即可 因为选一些不是最小的，现在即使更新了，
+          也不可能是最小值，后续也会被再次更新，故而本次更新是不必要的
+        1）每个节点链接了哪些边，邻接表
+        2）mindist 存储各个最小值
+        3）队列 在极端情况下，即：所有节点都与其他节点相连，每个节点的入度为 n-1 （n为节点数量），所以每个节点最多加入 n-1 次队列
+        */
+        int n, m, p1, p2, val;
+        struct Edge
+        {
+            int to;
+            int val;
+            // 初始化构造函数
+            Edge(int t, int w) : to(t), val(w) {}
+        };
+        vector<list<Edge>> grid;
+        while (m--)
+        {
+            cin >> p1 >> p2 >> val;
+            grid[p1].push_back(Edge(p2, val));
+        }
+        queue<int, vector<int>> open_pq;
+        vector<int> minDist(n, numeric_limits<int>::max());
+        int start = 1;
+        int end = n;
+        minDist[start] = 0;
+        open_pq.push(start);
+        while (!open_pq.empty())
+        {
+            int current = open_pq.front();
+            open_pq.pop();
+            for (const Edge &side : grid[current])
+            {
+                // 松弛操作 判断大小
+                if (minDist[side.to] > minDist[current] + side.val)
+                {
+                    minDist[side.to] = minDist[current] + side.val;
+                    open_pq.push(side.to);
+                }
+            }
+        }
+        if (minDist[end] == numeric_limits<int>::max())
+            cout << "Not have shortest path from start to end";
+        else
+            cout << "the shortest path is " << minDist[end];
+    }
+    // Bellmanford 判断负权回路
+    /*
+    在没有负权回路的图中，松弛 n 次以上 ，结果不会有变化。
+    但本题有 负权回路，如果松弛 n 次，结果就会有变化了，因为 有负权回路 就是可以无限最短路径（一直绕圈，就可以一直得到无限小的最短距离）。
+    那么每松弛一次，都会更新最短路径，所以结果会一直有变化。
+    基于SPFA队列优化的:
+        如果使用 SPFA 那么节点都是进队列的，那么节点进入队列几次后 足够判断该图是否有负权回路呢？
+        在 0094.城市间货物运输I-SPFA 中，我们讲过 在极端情况下，即：所有节点都与其他节点相连，每个节点的入度为 n-1 （n为节点数量），所以每个节点最多加入 n-1 次队列。
+        那么如果节点加入队列的次数 超过了 n-1次 ，那么该图就一定有负权回路。
+    */
+    // TODO:Bellmanford 单源有限最短路,之后再做
+    /*
+    最多经过 k 个城市的条件下，而不是一定经过k个城市，也可以经过的城市数量比k小，但要最短的路径。
+    */
+    // Folyd算法
+    
+    // A*算法
+    // D*算法
 };

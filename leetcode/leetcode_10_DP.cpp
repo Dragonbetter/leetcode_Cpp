@@ -297,10 +297,99 @@ class DP_Solution{
         // 相撞之后剩下的最小石头重量就是 (sum - dp[target]) - dp[target]。
         return sum - dp[target] - dp[target];
     }
-    // leetcode 494 0711 
-    int findTargetSumWays(vector<int>& nums, int target) {
-        
+    // leetcode 494 0711 -》 0730 ！！ 真的必须每天刷题 
+    // 分析即left组合-right组合 = target； 而left + right = sum; ==>left =(target+sum)/2
+    // 首先尝试使用回溯法，即需要在数组集合里取出部分值，从而使得其值的总和为left;
+    // 回溯主要分为及部分，第一结束条件，第二循环的起始点或剪枝，第三答案的逐步添加
+    vector<vector<int>> targetsum_result;
+    vector<int> targetsum_path;
+    void TargetSumbacktracing(vector<int> & nums, int left_target,int sum, int startindex){
+        // 输入的参数需要包含对应的已有累加值以及该次循环的起始值
+        if(sum == left_target){
+            targetsum_result.push_back(targetsum_path);
+        }
+        for(int i=startindex;i<nums.size()&&sum+nums.at(i)<=left_target;i++){
+            sum += nums.at(i);
+            targetsum_path.push_back(nums[i]);
+            // 继续进行下一步的迭代 ==> 基于当前的i进一步的往下
+            TargetSumbacktracing(nums,left_target,sum,i+1);
+            sum -= nums.at(i);
+            targetsum_path.pop_back();
+        }
     }
+    int findTargetSumWays_backtracing(vector<int>&nums,int target){
+        int sum=0 ;
+        for(int i=0;i<nums.size();i++){sum+=nums[i];}
+        if(target>sum){return 0;}
+        if((target+sum)%2){return 0;}
+        int left_sum = (target+sum)/2;
+        targetsum_result.clear();
+        targetsum_path.clear();
+        sort(nums.begin(),nums.end());
+        // 排序后可以进一步的剪枝 
+        TargetSumbacktracing(nums,left_sum,0,0);
+        return targetsum_result.size();
+    }
+    // 回溯法耗时严重 动态规划可以转换为背包问题 但背包问题里的组合数量如何获取
+    // 01背包问题 装满容量为x的背包，有几种方法。
+    // 设置dp[j]为装满容量为j的背包，有几种方法；那么对应的递推关系则是相应的dp[j]+=dp[j-nums[i]];
+    // 因为dp[j-nums[i]]所对应的数量只要再加一个nums{i}就能同时满足要求，故而次数需要同时累加 
+    // 还有一个重要的是对应的循环遍历的顺序，外循环对应的是nums[i]，而内循环对应的是dp[j],dp[j]需要倒序去进行遍历
+    // 因为本质上dp[j]基于的是上一层的dp[j]，即从后更新则能满足该要求
+    int findTargetSumWays(vector<int>& nums, int target) {
+        int sum=0;
+        for(int i=0;i<nums.size();i++){sum+=nums.at(i);}
+        if(abs(target)>sum) return 0;
+        if((target+sum)%2) {return 0;}
+        int left_target = (target+sum)/2;
+        vector<int> dp(left_target+1,0);
+        dp[0]=1; // 初始化得为1，因为递推得条件基于该起，如果不是1，则后续一直是0；
+        for(int i=0;i<nums.size();i++){
+            for(int j=left_target;j>= nums[i];j--){
+                // j >= nums[i] 是为了确保在当前背包容量 j 下，可以加入当前数字 nums[i]。
+                // 如果 j < nums[i]，则当前数字 nums[i] 无法放入容量为 j 的背包中。
+                dp[j] += dp[j-nums[i]]; // ==》 j-nums[i]>=0 !!
+            }
+        }
+        return dp[left_target];
+    }
+    // leetcode 474 一和零 0730
+    /*
+    基于回溯的原则进行设计分析 ==》 
+    从里面挑选x个元素，满足不超过m和n的限制，同时x尽可能的大
+    本题中strs 数组里的元素就是物品，每个物品都是一个！
+    而m 和 n相当于是一个背包，两个维度的背包。
+    dp[i][j]：最多有i个0和j个1的strs的最大子集的大小为dp[i][j]。
+    dp[i][j] 可以由前一个strs里的字符串推导出来，strs里的字符串有zeroNum个0，oneNum个1
+    dp[i][j] 就可以是 dp[i - zeroNum][j - oneNum] + 1。
+    然后我们在遍历的过程中，取dp[i][j]的最大值。
+    递推公式：dp[i][j] = max(dp[i][j], dp[i - zeroNum][j - oneNum] + 1);
+    
+    */ 
+    int findMaxForm(vector<string>& strs, int m, int n) {
+        vector<vector<int>> dp(m+1,vector<int>(n+1,0));
+        for(string str: strs){
+            // 统计计算对应的字符数量
+            int oneNum = 0,zeroNum =0;
+            for(char c:str){
+                if(c=='0'){
+                    zeroNum++;
+                }
+                else{
+                    oneNum++;
+                }
+            }
+            for(int i=m;i>=zeroNum;i--){
+                for(int j=n;j>=oneNum;j--){
+                    dp[i][j] = max(dp[i][j],dp[i-zeroNum][j-oneNum]+1);     
+                }
+            }
+        }
+        return dp[m][n];        
+    }
+    // 完全背包理论基础 2024.07.31!!
+    
+
 
 };
 int main(){
