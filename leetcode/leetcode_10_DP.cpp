@@ -642,7 +642,7 @@ class DP_Solution{
     // leetcode 121 买卖股票的最佳时机 2024.08.04
     // 贪心做法 ==》 因为全程只有一次买卖，而想要获得最佳收益，只需要右边的最大值减去左边的最小值即可
     // 具体做法的话，在遍历过程中不断搜寻左边的最小值，同时用当前值进去最小值，并取max，则可以通过遍历的方式获取对应的max
-    int maxProfit(vector<int> & prices){
+    int maxProfit_101(vector<int> & prices){
         int min_value = INT_MAX,result = 0;
         for(int i=0;i<prices.size();i++){
             min_value = min(min_value,prices[i]);
@@ -665,7 +665,7 @@ class DP_Solution{
     循环遍历条件即顺序遍历即可，因为对应的i依赖于先前的i-1的结果
     return dp[i][1];不持有股票时获得价值会更大
     */
-   int maxProfit(vector<int> & prices){
+   int maxProfit_102(vector<int> & prices){
         vector<vector<int>> dp(prices.size(),vector<int>(2));
         dp[0][0] = -prices[0];
         for(int i=0;i<prices.size();i++){
@@ -681,7 +681,7 @@ class DP_Solution{
    当可以同时买卖多次股票的时候，我们需要尽量选择只有正利润的时刻进行交易，避免负利润的影响
    故而可以首先基于差值计算出正利润，并将其累加，即可获得最终的结果
    */
-   int maxProfit_II(vector<int> & prices){
+   int maxProfit_201(vector<int> & prices){
     int result = 0;
     for(int i=1;i<prices.size();i++){
         result += max(prices[i]-prices[i-1],0);
@@ -694,7 +694,7 @@ class DP_Solution{
       当买入股票时，当前时刻的现金需要考虑前期的利润情况，即不再是-prices[i]；而是对应的dp[i-1][1]-prices[i];
       需要将前一时刻不持有股票的利润对应的也加进去
    */
-    int maxProfit_II(vector<int> &prices){
+    int maxProfit_202(vector<int> &prices){
         vector<vector<int>> dp(prices.size(),vector<int>(2));
         dp[0][0] = -prices[0];
         for(int i=1;i<prices.size();i++){
@@ -711,7 +711,7 @@ class DP_Solution{
     分别表示的是第一次持有，第一次不持有，第二次持有，第二次不持有的一个状态
     而后可以基于此进行状态转换的递推方程的撰写
     */
-    int maxProfit_III(vector<int> &prices){
+    int maxProfit_301(vector<int> &prices){
         vector<vector<int>> dp(prices.size(),vector<int>(4));
         dp[0][0] = -prices[0]; // 第一次持有
         dp[0][1] = 0; // 第一次不持有
@@ -733,7 +733,7 @@ class DP_Solution{
     ==》 而同时为了使得数组的形式一直，引入dp[i][0] =dp[i-1][0] 表示无操作。
     即0(无操作)-1(买入)-2(卖出)-3(买入)-4(卖出)！！
     */
-    int maxProfit_IV(vector<int> &prices,int k){
+    int maxProfit_401(vector<int> &prices,int k){
         vector<vector<int>> dp(prices.size(),vector<int>(2*k+1));
         // 初始化
         // 奇数代表的是持有，而持有状态下的结果为-prices[0]
@@ -795,7 +795,7 @@ class DP_Solution{
     /*
     区别就是这里需要多一个减去手续费的操作    
     */
-    int maxProfit(vector<int>& prices, int fee) {
+    int maxProfit_with_fee(vector<int>& prices, int fee) {
         int n = prices.size();
         vector<vector<int>> dp(n, vector<int>(2, 0));
         dp[0][0] -= prices[0]; // 持股票
@@ -810,32 +810,339 @@ class DP_Solution{
     从买卖一次到买卖多次，从最多买卖两次到最多买卖k次，
     从冷冻期再到手续费，
     */
+   // 子序列问题分析 41-44 2024.08.05
+   /*
+   1）子序列问题是动态规划解决的经典问题，当前下标i的递增子序列长度，其实和i之前的下表j的子序列长度有关系
+   2）dp[i]表示i之前包括i的以nums[i] 结尾 的最长递增子序列的长度 【注意此处强调结尾的元素】
+   3) 不连续递增子序列的跟前0-i 个状态有关，连续递增的子序列只跟前一个状态有关
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+   
+   */
+    // leetcode 300 最长递增子序列
+    /*2024.08.05 
+    1. dp[i]表示i之前包括i的以nums[i] 结尾 的最长递增子序列的长度
+    2. 当nums[i]>nums[j]时，dp[i] = max(dp[i],dp[j]+1),其中j是从0到i-1，
+        即当前的i元素比之前以j结尾的元素更大，那么就可以基于其+1；
+        不同的以j结尾反映了这过程中可能的元素突然增大的情况
+    3. 元素的初始化都是1，因为以自己为对应的单个元素的递增情况
+    */
+    int lengthOfLIS(vector<int>& nums) {
+        vector<int> dp(nums.size(),1);
+        for(int i=1;i<nums.size();i++){
+            for(int j=0;j<i;j++){
+                if(nums[i]>nums[j]){
+                    dp[i] = max(dp[i],dp[j]+1);
+                }
+            }
+        }
+        int result = 0;
+        for(int i=0;i<dp.size();i++){
+            result = max(result,dp[i]);
+        }
+        return result;
+    }
+    // leetcode 674. 最长连续递增序列 
+    // 2024.08.05
+    // 
+    int findLengthOfLCIS(vector<int>& nums) {
+        vector<int> dp(nums.size(),1);
+        int result=dp[0];
+        for(int i=1;i<nums.size();i++){
+            if(nums[i]>nums[i-1]) {dp[i]=dp[i-1]+1;}
+            else{dp[i]=1;}
+            result = max(result,dp[i]);
+        }
+        return result;
+    }
+    // leetcode 718. 最长重复子数组
+    /* 2024.08.05
+    需要完全相同的，不能拆分
+    给两个整数数组 A 和 B ，返回两个数组中公共的、长度最长的子数组的长度。
+    1）用二维数组可以记录两个字符串的所有比较情况
+    2）dp[i][j]表示以i和j为结尾的两个字符串的比较情况
+    3）dp[i][j] = dp[i-1][j-1]+1 (if nums[i]=nums[j])
+    4) 初始化需要针对于dp[0][j],dp[i][0]进行专门的分析
+    5）最终的结果取整个dp表格的max，当可以把这个融入到遍历当中，这需要遍历的顺序从（0，0）开始
+        因为比较需要从该处开始
+    */
+    int findLength(vector<int>& nums1, vector<int>& nums2) {
+        vector<vector<int>> dp(nums1.size(),vector<int>(nums2.size()));
+        // inital
+        for(int i=0;i<nums1.size();i++){
+            if(nums1[i]==nums2[0]){dp[i][0]=1;}
+        }
+        for(int j=0;j<nums2.size();j++){
+            if(nums2[j]==nums1[0]){dp[0][j]=1;}
+        }
+        int result = 0;
+        for(int i=0;i<nums1.size();i++){
+            for(int j=0;j<nums2.size();j++){
+                if(nums1[i]==nums2[j]&&i>0&&j>0){
+                    dp[i][j] = dp[i-1][j-1]+1;
+                }
+                if(dp[i][j]>result){result = dp[i][j];}
+            }
+        }
+        return result;   
+    }
+    // leetcode 1143.最长公共子序列
+    /* 2024.08.05
+    给定两个字符串 text1 和 text2，返回这两个字符串的最长公共子序列的长度。
+    一个字符串的 子序列 是指这样一个新的字符串：
+    它是由原字符串在不改变字符的相对顺序的情况下删除某些字符（也可以不删除任何字符）后组成的新字符串。
+    ==》子序列和子数组的区别之一，即其可以不连续！！
+    递推
+    */
+    int longestCommonSubsequence_complex(string text1, string text2) {
+        vector<vector<int>> dp(text1.size(),vector<int>(text2.size()));
+        // inital
+        for(int i=0;i<text1.size();i++){
+            if(text1[i]==text2[0]){dp[i][0]=1;}
+        }
+        for(int j=0;j<text2.size();j++){
+            if(text2[j]==text1[0]){dp[0][j]=1;}
+        }
+        for(int i=0;i<text1.size();i++){
+            for(int j=0;j<text2.size();j++){
+                if(text1[i]==text2[j]&&i>0&&j>0){
+                    dp[i][j] = dp[i-1][j-1]+1;
+                }
+                else{
+                    // 遍历需要从0开始，因为再推导的时候仍然需要用到基于0的
+                    // 那么在max的过程中，会出现i-1或者j-1为零的情况，故而需要谨慎处理该边界情况
+                    if(i>0){
+                        dp[i][j]=max(dp[i][j],dp[i-1][j]);
+                    }
+                    if(j>0){
+                        dp[i][j]=max(dp[i][j],dp[i][j-1]);
+                    }
+                    // 不需要连续的情况下，当不相同的时候则不是直接赋予0，而是继承先前的结果
+                }
+            }
+        }
+        return dp[text1.size()-1][text2.size()-1];  
+    } 
+    // ==》优化版本 现在的边界处理情况很复杂  2024.08.05
+    // 主要体现在因为i-1和j-1的存在，需要处理负数的情况，那么可以基于此横纵向都多添加一列
+    int longestCommonSubsequence(string text1, string text2) {
+        vector<vector<int>> dp(text1.size()+1,vector<int>(text2.size()+1));
+        for(int i=1;i<=text1.size();i++){
+            for(int j=1;j<=text2.size();j++){
+                // 多了一个全0的，而后从1开始，则避免了dp里面负数的情况
+                // dp[i][j]代表的是以i-1和j-1结尾的两个字符的匹配情况
+                if(text1[i-1]==text2[j-1]){dp[i][j]=dp[i-1][j-1]+1;}
+                else{dp[i][j]=max(dp[i-1][j],dp[i][j-1]);}
+            }
+        }
+        return dp[text1.size()][text2.size()];
+    }
+    // leetcode 1035 不相交的线 2024.08.06
+    /*
+    ==》其实可以转换为两个数组的最长子序列
+    dp[i][j] 表示以i-1结尾的序列A和以j-1结尾的序列B的最长子序列的长度
+    */
+    int maxUncrossedLines(vector<int>& nums1, vector<int>& nums2) {
+        vector<vector<int>> dp(nums1.size()+1,vector<int>(nums2.size()+1));
+        for(int i=1;i<=nums1.size();i++){
+            for(int j=1;j<=nums2.size();j++){
+                if(nums1[i-1]==nums2[j-1]){dp[i][j]=dp[i-1][j-1]+1;}
+                else{
+                    dp[i][j]=max(dp[i][j-1],dp[i-1][j]);
+                }
+            }
+        }
+        return dp[nums1.size()][nums2.size()];
+    }      
+    // leetcode 53. 最大子序和 2024.08.06
+    /*
+        1.仍然以dp[i]表示以i为结尾的最大子序和
+        2.dp[i]=max(dp[i-1]+nums[i],nums[i])
+        ==> 以i-1为结尾的元素代表的是累计的加和，如果其为正，则继续累加；如果为负，则重新开始累加即nums[i]
+    */
+    int maxSubArray(vector<int>& nums) {
+        if (nums.size() == 0) return 0;
+        vector<int> dp(nums.size());
+        dp[0] = nums[0];
+        int result = dp[0];
+        for(int i =1;i<nums.size();i++){
+            dp.at(i) = max(dp.at(i-1)+nums.at(i),nums.at(i));
+            result = max(result,dp.at(i));
+        }
+        return result;
+    }
+    // 编辑距离系列分析！！
+    // leetcode 392 判断子序列 2024.08.06
+    // dp[i][j] 表示以下标i-1为结尾的字符串s，和以下标j-1为结尾的字符串t，相同子序列的长度为dp[i][j]。
+    bool isSubsequence(string s, string t) {
+        // 基于最长公共子序列即可完成，但应该可以进一步的简化
+        vector<vector<int>> dp(s.size() + 1, vector<int>(t.size() + 1, 0));
+        for (int i = 1; i <= s.size(); i++) {
+            for (int j = 1; j <= t.size(); j++) {
+                if (s[i - 1] == t[j - 1]) dp[i][j] = dp[i - 1][j - 1] + 1;
+                else dp[i][j] = dp[i][j - 1];
+                // 与最长公共子序列的区别在这里，即i是s的，不用考虑i-1；因为主要是在t里找s；
+            }
+        }
+        if (dp[s.size()][t.size()] == s.size()) return true;
+        return false;
+    }
+    /*
+    leetcode 72: 编辑距离： 2024.08.06
+    给你两个单词 word1 和 word2，请你计算出将 word1 转换成 word2 所使用的最少操作数 。
+    你可以对一个单词进行如下三种操作：插入,删除,替换;
+    dp[i,j]表示以word1下以i-1结尾和word2下以j-1结尾的最短编辑距离；
+    分为多种情况；
+    如果word1[i-1] == word2[j-1] 的话； 则说明他们不需要操作，即距离为0
+    dp[i][j] = dp[i-1][j-1];
+    如果word1[i-1] ！= word2[j-1] 的话，也分多种情况：
+    1. 他们确实不相等，采用替换操作 dp[i][j] = dp[i-1][j-1]+1;
+    2. 即word2的第j个字符应该与word1的前i-1个进行匹配：说明x多写，或y漏写
+        dp[i][j] = dp[i-1][j] + 1(x,_)
+    3. 即word2的前j-1个字符与word1的第i个字符匹配，则说明x漏写，或y多写
+        dp[i][j] = dp[i][j-1] + 1(_,y)
+    而后应该取三种操作里的最小值！！
+    ==》初始化：
+    dp[i][0] ：以下标i-1为结尾的字符串word1，和空字符串word2，最近编辑距离为dp[i][0]。
+    那么dp[i][0]就应该是i，对word1里的元素全部做删除操作，即：dp[i][0] = i;
+    */
+    int minDistance(string word1, string word2) {
+        if(word1.size()==0 || word2.size() == 0){return max(word1.size(),word2.size());}
+        vector<vector<int>> dp(word1.size()+1,vector<int>(word2.size()+1));
+        for (int i = 0; i <= word1.size(); i++) dp[i][0] = i;
+        for (int j = 0; j <= word2.size(); j++) dp[0][j] = j;
+        for(int i=1;i<=word1.size();i++){
+            for(int j=1;j<=word2.size();j++){
+                if(word1[i-1]==word2[j-1]){dp[i][j]=dp[i-1][j-1];}
+                else{
+                    dp[i][j] = min(dp[i-1][j-1]+1,min(dp[i-1][j]+1,dp[i][j-1]+1));
+                }
+            }
+        }
+        return dp[word1.size()][word2.size()];
+    }
+    // leetcode 115 不同的子序列 2024.08.08
+    /*
+    给定一个字符串 s 和一个字符串 t ，计算在 s 的子序列中 t 出现的个数。
+    ==》基于是子序列进行更一步升级，有多少中形成该子序列的方法！！
+    dp[i][j]：以i-1为结尾的s子序列中出现以j-1为结尾的t的 个数 为dp[i][j]。
+    分析分为两种情况：
+    1. s[i-1] == t[j-1]:
+        继续分为两种：
+        1）用s[i-1]与t[j-1]去匹配，那么相当于序列的延申，故而dp[i][j] = dp[i-1][j-1];
+        2）不用s[i-1]与t[j-1]去匹配，即用i-2去匹配，用前面一个的结果；dp[i][j] = dp[i-1][j]
+        则dp[i][j] = dp[i-1][j-1]+dp[i-1][j];
+    2.s[i-1] != t[j-1]:
+        1) 则只能用i-2去与j-1匹配，故而dp[i][j] = dp[i-1][j];
     
-
-
+    ==> 初始化分析：
+    1). dp[i][0],以i-1为末尾的字符包含空字符串，则只能全删除完毕，故而dp[i][0] =1;
+    2). dp[0][i],空字符串包含以i-1结尾的字符串，则不可能，故而dp[0][j] = 0;
+    3). dp[0][0] = 1;
+    */
+    int numDistinct(string s, string t) {
+        vector<vector<uint64_t>> dp(s.size()+1,vector<uint64_t>(t.size()+1));
+        for(int i=0;i<=s.size();i++){dp[i][0]=1;}
+        for(int j=1;j<=t.size();j++){dp[0][j]=0;}
+        for(int i=1;i<=s.size();i++){
+            for(int j=1;j<=t.size();j++){
+                if(s.at(i-1)==t.at(j-1)){
+                    dp.at(i).at(j) = dp.at(i-1).at(j-1)+dp.at(i-1).at(j);
+                }
+                else{
+                    dp.at(i).at(j) = dp.at(i-1).at(j);
+                }
+            }
+        }
+        return dp.at(s.size()).at(t.size());
+    }
+    // leetcode 583. 两个字符串的删除操作 2024.08.08
+    /*
+    1. 其实就是先找到最长的公共子序列
+    2. 将word1和word2中更长的序列减去最长公共子序列的长度
+    dp[i][j] 表示以i-1为结尾的word1和以j-1为结尾的word2的最长公共子序列长度
+    当word1[i-1] == word2[j-1] dp[i][j] = dp[i-1][j-1]+1;
+    != 时 dp[i][j] = max(dp[i-1][j],dp[i][j-1])
+    初始化则全为0；
+    */
+    int minDistance(string word1, string word2) {
+        vector<vector<int>> dp(word1.size()+1,vector<int>(word2.size()+1));
+        for(int i=1;i<=word1.size();i++){
+            for(int j=1;j<=word2.size();j++){
+                if(word1[i-1]==word2[j-1]){dp[i][j]=dp[i-1][j-1]+1;}
+                else{
+                    dp[i][j] = max(dp[i-1][j],dp[i][j-1]);
+                }
+            }
+        }
+        int max_len =  dp[word1.size()][word2.size()];
+        return max(word1.size(),word2.size()) - max_len;
+    }
+    // leetcode 647 回文子串 2024.08.08
+    /*
+    回文子串的性质在于可以从中间往两边延申；其中对应的dp[i][j]可以由dp[i+1][j-1]推出来
+    故而基于该性质推导对应的递推公式
+    当s[i] == s[j]时,有多种情况：
+    1. i==j 肯定是回文子串 true
+    2. i!=j 相差为1，也肯定是
+    3. i!=j 相差大于1，则基于dp[i+1][j-1]的值进行分析
+    当s[i]!=s[j]:
+    则直接是false
+    */
+    int countSubstrings(string s) {
+        vector<vector<bool>> dp(s.size(),vector<bool>(s.size(),false));
+        // 初始化结构分析：
+        int result;
+        for(int i=s.size()-1;i>=0;i--){
+            for(int j=i;j<s.size();j++){
+                if(s[i]==s[j]){
+                    if(j-i<=1){
+                        // 刚好对应回文子串的单个和两个的情况
+                        dp[i][j] = true;
+                        result++;
+                    }
+                    else{
+                        if(dp[i+1][j-1]){
+                            dp[i][j] = true;
+                            result++;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+    // leetcode 516 最长回文子序列 2024.08.08
+    /*
+    回文子串是要连续的，回文子序列可不是连续的！
+    dp[i][j]：字符串s在[i, j]范围内最长的回文子序列的长度为dp[i][j]。
+    在判断回文子串的题目中，关键逻辑就是看s[i]与s[j]是否相同。
+    如果s[i]与s[j]相同，那么dp[i][j] = dp[i + 1][j - 1] + 2;
+    如果s[i]与s[j]不相同，说明s[i]和s[j]的同时加入 并不能增加[i,j]区间回文子序列的长度，那么分别加入s[i]、s[j]看看哪一个可以组成最长的回文子序列。
+    加入s[j]的回文子序列长度为dp[i + 1][j]。
+    加入s[i]的回文子序列长度为dp[i][j - 1]。
+    那么dp[i][j]一定是取最大的，即：dp[i][j] = max(dp[i + 1][j], dp[i][j - 1]);
+    */
+    int longestPalindromeSubseq(string s) {
+        vector<vector<int>> dp(s.size(),vector<int>(s.size()));
+        for (int i = 0; i < s.size(); i++) dp[i][i] = 1;
+        for(int i=s.size()-1;i>=0;i--){
+            for(int j=i+1;j<s.size();j++){
+                if(s[i]==s[j]){
+                    dp[i][j] = dp[i + 1][j - 1] + 2;
+                }
+                else{
+                     dp[i][j] = max(dp[i + 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+        return dp[0][s.size()-1];
+    }
 };
 int main(){
     DP_Solution s;
-    int n, bagweight;
-    cout << "Enter n and bagweight: ";
-    while(cin>>n>>bagweight){
-        s.bag01_dp2(n,bagweight);
-    }
+    vector<int> input = {10,9,2,5,3,7,101,18};
+    int result = s.lengthOfLIS(input);
+    cout<<"result"<<result;
     return 0;
 }
 
